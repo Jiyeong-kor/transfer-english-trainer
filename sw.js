@@ -1,11 +1,14 @@
-const CACHE = "transfer-english-trainer-v3";
+const CACHE = "transfer-english-trainer-v5";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./practice.css",
+  "./ux-fixes.css",
   "./app.js",
   "./app-enhancements.js",
+  "./app-ux-parity.js",
+  "./app-update.js",
   "./content/vocabulary.js",
   "./content/grammar-v2.js",
   "./manifest.webmanifest",
@@ -24,6 +27,10 @@ self.addEventListener("activate", (event) => {
     )
   );
   self.clients.claim();
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
 });
 
 self.addEventListener("fetch", (event) => {
