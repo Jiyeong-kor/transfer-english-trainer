@@ -26,5 +26,6 @@ jobs:
           node --check app-enhancements.js
           node --check exam-mode.js
           node --check app-update.js
+          node --check new-problems.js
           node --check content/grammar-v2.js
           node --check sw.js
