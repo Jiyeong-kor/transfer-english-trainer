@@ -32,6 +32,7 @@ jobs:
         run: |
           node scripts/validate-data.mjs
           node scripts/validate-data-v2.mjs
+          node scripts/validate-exam-ux.mjs
 
       - name: JavaScript 구문 검사
         run: |
