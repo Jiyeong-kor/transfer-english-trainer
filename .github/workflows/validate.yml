@@ -18,6 +18,8 @@ jobs:
           node-version: 22
       - name: 학습 데이터 검증
         run: node scripts/validate-data-v2.mjs
+      - name: 편입영어 실전형 UX 회귀 검증
+        run: node scripts/validate-exam-ux.mjs
       - name: 앱 자바스크립트 구문 검증
         run: |
           node --check app.js
