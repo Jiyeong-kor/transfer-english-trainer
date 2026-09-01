@@ -33,6 +33,7 @@ jobs:
           node scripts/validate-data.mjs
           node scripts/validate-data-v2.mjs
           node scripts/validate-exam-ux.mjs
+          node scripts/validate-progress-priority.mjs
 
       - name: JavaScript 구문 검사
         run: |
