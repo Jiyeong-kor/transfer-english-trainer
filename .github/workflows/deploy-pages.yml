@@ -42,9 +42,11 @@ jobs:
           node --check content/grammar-v2.js
           node --check sw.js
 
-      - name: GitHub Pages 구성 확인
+      - name: GitHub Pages 구성
         if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: 배포 파일 구성
         if: github.event_name != 'pull_request'
