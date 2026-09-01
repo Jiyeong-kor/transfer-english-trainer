@@ -1,0 +1,19 @@
+{
+  "name": "편입영어 트레이너",
+  "short_name": "편입영어",
+  "description": "Notion 편입영어 오답노트를 기반으로 어휘와 문법을 반복 학습하는 개인용 앱",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f7fb",
+  "theme_color": "#172554",
+  "lang": "ko",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

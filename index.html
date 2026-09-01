@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#172554" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="편입영어" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="description" content="Notion 편입영어 오답노트를 기반으로 어휘와 문법을 반복 학습하는 개인용 PWA" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles.css" />
+  <title>편입영어 트레이너</title>
+</head>
+<body>
+  <noscript>이 학습 앱을 사용하려면 JavaScript를 켜야 합니다.</noscript>
+  <div id="app"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <input id="backup-import" type="file" accept="application/json,.json" hidden />
+  <script src="./content/vocabulary.js"></script>
+  <script src="./content/grammar.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
