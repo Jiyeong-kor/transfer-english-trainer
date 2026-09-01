@@ -33,6 +33,7 @@ jobs:
           node scripts/validate-data.mjs
           node scripts/validate-data-v2.mjs
           node scripts/validate-exam-ux.mjs
+          node scripts/validate-grammar-exam.mjs
           node scripts/validate-progress-priority.mjs
 
       - name: JavaScript 구문 검사
@@ -40,6 +41,7 @@ jobs:
           node --check app.js
           node --check app-enhancements.js
           node --check exam-mode.js
+          node --check grammar-exam.js
           node --check app-update.js
           node --check new-problems.js
           node --check content/vocabulary.js
