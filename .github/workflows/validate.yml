@@ -22,5 +22,7 @@ jobs:
         run: |
           node --check app.js
           node --check app-enhancements.js
+          node --check app-ux-parity.js
+          node --check app-update.js
           node --check content/grammar-v2.js
           node --check sw.js
