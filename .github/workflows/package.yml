@@ -13,6 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 편입영어 실전형 UX 회귀 검증
+        run: node scripts/validate-exam-ux.mjs
       - name: 배포 파일 구성
         run: |
           mkdir -p dist/content
