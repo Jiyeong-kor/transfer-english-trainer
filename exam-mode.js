@@ -1,7 +1,7 @@
 "use strict";
 
 // 편입영어 실전형 학습 모드
-// 모든 학습 세션을 선택지 기반으로 통일하고, 선택 즉시 객관식으로 채점합니다.
+// 최종 문제 화면의 선택 즉시 채점, 모르겠음, 다음 버튼 이동, 문항 위치 복원을 여기서 보장합니다.
 
 function examVariant(item, session) {
   if (item.type === "grammar") return "grammar-choice";
@@ -24,6 +24,50 @@ function examResultDetails(item) {
   return enhDetails(item);
 }
 
+function examPositionQuestionAtReadingStart() {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const card = app.querySelector(".study-card");
+      if (!card) return;
+
+      const head = app.querySelector(".study-head");
+      const headBottom = head?.getBoundingClientRect().bottom || 0;
+      const cardTop = card.getBoundingClientRect().top;
+      const targetTop = window.scrollY + cardTop - headBottom - 8;
+
+      window.scrollTo({
+        top: Math.max(0, Math.round(targetTop)),
+        behavior: "auto",
+      });
+    });
+  });
+}
+
+function examPositionNextActionForTap() {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const nextButton = app.querySelector("[data-exam-next]");
+      if (!nextButton) return;
+
+      const head = app.querySelector(".study-head");
+      const viewportTop = (head?.getBoundingClientRect().bottom || 0) + 10;
+      const viewportBottom = window.innerHeight - Math.max(12, parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--safe-bottom")) || 0);
+      const buttonRect = nextButton.getBoundingClientRect();
+
+      if (buttonRect.top >= viewportTop && buttonRect.bottom <= viewportBottom - 10) return;
+
+      const delta = buttonRect.bottom > viewportBottom - 10
+        ? buttonRect.bottom - (viewportBottom - 10)
+        : buttonRect.top - viewportTop;
+
+      window.scrollBy({
+        top: Math.round(delta),
+        behavior: "auto",
+      });
+    });
+  });
+}
+
 function examRecordChoice(session, item, variant, model, selectedIndex) {
   session.draft ||= {};
   if (session.draft.submitted) return;
@@ -34,14 +78,40 @@ function examRecordChoice(session, item, variant, model, selectedIndex) {
   session.draft.selected = selectedIndex;
   session.draft.submitted = true;
   session.draft.objectiveCorrect = objectiveCorrect;
+  session.draft.objectiveUnknown = false;
   session.draft.reviewRecorded = true;
 
-  session.objective ||= { answered: 0, correct: 0 };
+  session.objective ||= { answered: 0, correct: 0, unknown: 0 };
   session.objective.answered += 1;
   if (objectiveCorrect) session.objective.correct += 1;
 
   enhRecordReview(item.id, grade, objectiveCorrect, variant);
   session.grades[grade] += 1;
+  saveState();
+}
+
+function examRecordUnknown(session, item, variant) {
+  session.draft ||= {};
+  if (session.draft.submitted) return;
+
+  session.draft.selected = null;
+  session.draft.submitted = true;
+  session.draft.objectiveCorrect = null;
+  session.draft.objectiveUnknown = true;
+  session.draft.reviewRecorded = true;
+
+  session.objective ||= { answered: 0, correct: 0, unknown: 0 };
+  session.objective.answered += 1;
+  session.objective.unknown = (session.objective.unknown || 0) + 1;
+
+  enhRecordReview(item.id, "again", null, variant);
+  const review = state.reviews[item.id];
+  if (review) {
+    review.lastObjectiveUnknown = true;
+    const latest = review.history?.at(-1);
+    if (latest) latest.objectiveUnknown = true;
+  }
+  session.grades.again += 1;
   saveState();
 }
 
@@ -59,8 +129,29 @@ function examAdvance() {
 
   saveState();
   render();
-  window.scrollTo({ top: 0, behavior: "auto" });
+  examPositionQuestionAtReadingStart();
 }
+
+function examSaveAndGoHome() {
+  if (!state.activeSession) return goHome();
+  saveState();
+  view = { name: "home", filter: view.filter || "all", reveal: false };
+  render();
+  window.scrollTo({ top: 0, behavior: "auto" });
+  showToast("진행 위치를 저장했습니다.");
+}
+
+const examOriginalStartSession = startSession;
+startSession = function startSessionWithReadingPosition(...args) {
+  examOriginalStartSession(...args);
+  if (state.activeSession && view.name === "study") examPositionQuestionAtReadingStart();
+};
+
+const examOriginalResumeSession = resumeSession;
+resumeSession = function resumeSessionWithReadingPosition(...args) {
+  examOriginalResumeSession(...args);
+  if (state.activeSession && view.name === "study") examPositionQuestionAtReadingStart();
+};
 
 renderHome = function renderHomeExam() {
   const stats = progressStats();
@@ -79,7 +170,7 @@ renderHome = function renderHomeExam() {
       <section class="hero">
         <small>오늘의 우선순위</small>
         <h1>선지를 보고 바로 고르기</h1>
-        <p>오늘의 12문제는 보기 없는 회상을 사용하지 않습니다. 어휘는 뜻과 유의어 4지선다로, 문법은 시험형 4지선다로 출제합니다. 틀린 문제는 자동으로 취약 항목에 누적합니다.</p>
+        <p>어휘는 뜻과 유의어 4지선다로, 문법은 시험형 4지선다로 출제합니다. 선지를 누르는 즉시 채점하고, 모르겠으면 선지를 고르지 않고 모르겠음으로 기록할 수 있습니다.</p>
         <div class="hero-actions">
           <button class="button primary" data-action="${state.activeSession ? "resume" : "daily"}">${state.activeSession ? "이어서 풀기" : "오늘 12문제 시작"}</button>
           <button class="button secondary" data-enh-action="test">20문제 실전 세트</button>
@@ -143,7 +234,7 @@ renderStudy = function renderStudyExam() {
   if (!currentItem) return goHome();
 
   session.draft ||= {};
-  session.objective ||= { answered: 0, correct: 0 };
+  session.objective ||= { answered: 0, correct: 0, unknown: 0 };
 
   const variant = examVariant(currentItem, session);
   const model = enhChoiceModel(currentItem, variant, session);
@@ -152,7 +243,8 @@ renderStudy = function renderStudyExam() {
   const review = reviewFor(currentItem.id);
   const submitted = Boolean(session.draft.submitted);
   const selected = session.draft.selected;
-  const objectiveCorrect = submitted ? Boolean(session.draft.objectiveCorrect) : null;
+  const unknown = Boolean(session.draft.objectiveUnknown);
+  const objectiveCorrect = submitted && !unknown ? Boolean(session.draft.objectiveCorrect) : null;
 
   const options = model.options.map((option, index) => {
     const classes = ["choice-option"];
@@ -168,7 +260,7 @@ renderStudy = function renderStudyExam() {
       <header class="study-head">
         <button class="icon-button" data-action="home">홈</button>
         <div class="progress-label">${esc(session.label)} · ${current}/${session.ids.length}</div>
-        <button class="icon-button" data-action="quit">종료</button>
+        <button class="icon-button" data-exam-action="save-home">저장하고 나가기</button>
       </header>
       <div class="progress-track"><div class="progress-fill" style="width:${percent}%"></div></div>
 
@@ -177,7 +269,7 @@ renderStudy = function renderStudyExam() {
           <span class="badge">${currentItem.type === "vocab" ? "어휘" : "문법"}</span>
           <span class="badge mode-badge">${esc(examVariantLabel(variant))}</span>
           ${currentItem.focus && !enhMastered(currentItem.id) ? `<span class="badge warn">집중 복습</span>` : ""}
-          ${review ? `<span class="badge">${review.lastObjectiveCorrect === false ? "최근 오답" : review.lastObjectiveCorrect === true ? "최근 정답" : esc(gradeLabel(review.lastGrade))}</span>` : ""}
+          ${review ? `<span class="badge">${review.lastObjectiveUnknown ? "최근 모르겠음" : review.lastObjectiveCorrect === false ? "최근 오답" : review.lastObjectiveCorrect === true ? "최근 정답" : esc(gradeLabel(review.lastGrade))}</span>` : ""}
         </div>
 
         <div class="prompt">
@@ -188,14 +280,16 @@ renderStudy = function renderStudyExam() {
         <div class="choice-list">${options}</div>
 
         ${submitted ? `
-          <div class="answer-panel result-panel ${objectiveCorrect ? "result-correct" : "result-wrong"}">
-            <h3>${objectiveCorrect ? "정답" : "오답"}</h3>
+          <div class="answer-panel result-panel ${unknown ? "result-unknown" : objectiveCorrect ? "result-correct" : "result-wrong"}">
+            <h3>${unknown ? "모르겠음" : objectiveCorrect ? "정답" : "오답"}</h3>
             <div class="answer-main">${esc(model.correct)}</div>
             ${examResultDetails(currentItem)}
             <div class="source">출처: ${esc(currentItem.source || "Notion 편입 영어 오답노트")}</div>
           </div>
-          <button class="button brand" data-exam-next>${current === session.ids.length ? "결과 보기" : "다음 문제"}</button>
-        ` : ""}
+          <button class="button brand full-action" data-exam-next>${current === session.ids.length ? "결과 보기" : "다음 문제"}</button>
+        ` : `
+          <button class="button secondary full-action" data-exam-unknown>모르겠음</button>
+        `}
       </section>
     </main>
   `;
@@ -207,7 +301,8 @@ renderSummary = function renderSummaryExam() {
 
   const answered = summary.objective?.answered || 0;
   const correct = summary.objective?.correct || 0;
-  const wrong = Math.max(0, answered - correct);
+  const unknown = summary.objective?.unknown || 0;
+  const wrong = Math.max(0, answered - correct - unknown);
   const accuracy = answered ? Math.round((correct / answered) * 100) : 0;
 
   app.innerHTML = `
@@ -219,10 +314,11 @@ renderSummary = function renderSummaryExam() {
         <div class="summary-grid">
           <div><strong>${correct}</strong><span>정답</span></div>
           <div><strong>${wrong}</strong><span>오답</span></div>
-          <div><strong>${accuracy}%</strong><span>정답률</span></div>
+          <div><strong>${unknown}</strong><span>모르겠음</span></div>
         </div>
+        <div class="summary-objective"><strong>${accuracy}%</strong><span>전체 정답률</span></div>
         <div class="summary-actions">
-          <button class="button primary" data-action="weak">오답 다시 풀기</button>
+          <button class="button primary" data-action="weak">오답·모르겠음 다시 풀기</button>
           <button class="button ghost" data-action="home">홈으로</button>
         </div>
       </section>
@@ -246,11 +342,31 @@ app.addEventListener("click", (event) => {
 
     examRecordChoice(session, item, variant, model, selectedIndex);
     render();
+    examPositionNextActionForTap();
+    return;
+  }
+
+  const unknownButton = event.target.closest("[data-exam-unknown]");
+  if (unknownButton) {
+    const session = state.activeSession;
+    if (!session || session.draft?.submitted) return;
+    const item = ITEM_MAP.get(session.ids[session.index]);
+    if (!item) return;
+    const variant = examVariant(item, session);
+    examRecordUnknown(session, item, variant);
+    render();
+    examPositionNextActionForTap();
     return;
   }
 
   const nextButton = event.target.closest("[data-exam-next]");
-  if (nextButton) examAdvance();
+  if (nextButton) {
+    examAdvance();
+    return;
+  }
+
+  const saveButton = event.target.closest('[data-exam-action="save-home"]');
+  if (saveButton) examSaveAndGoHome();
 });
 
 render();
