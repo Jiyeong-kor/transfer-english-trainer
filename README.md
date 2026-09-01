@@ -4,6 +4,10 @@ Notion의 `편입 영어 오답노트`를 모바일에서 반복 학습하기 �
 
 기존 `bigdata-analysis-engineer-written`의 모바일 학습 흐름과 오답 우선 복습 방식을 재사용하고, 편입영어에 맞게 회상과 변별 문제를 섞었습니다.
 
+> **운영 기본값**
+>
+> 이 저장소를 포함한 개인 학습 앱은 별도 지시가 없으면 기존 `bigdata-analysis-engineer-written`에서 검증한 방식을 재사용합니다. 즉, 정적 PWA로 구현하고 `main` 변경 시 GitHub Actions로 검증한 뒤 GitHub Pages에 자동 배포합니다. 새 배포 방식을 임의로 도입하지 않습니다.
+
 ## 학습 데이터
 
 현재 앱에는 Notion에서 확인한 자료를 기준으로 총 55개 항목이 들어 있습니다.
@@ -87,14 +91,16 @@ Notion의 `편입 영어 오답노트`를 모바일에서 반복 학습하기 �
 │   └── validate-data-v2.mjs
 └── .github/workflows/
     ├── validate.yml
-    └── package.yml
+    ├── package.yml
+    └── deploy-pages.yml
 ```
 
 ## 검증
 
-`main`에 변경이 들어오면 GitHub Actions가 다음 항목을 자동 검증합니다.
+`main`에 변경이 들어오면 GitHub Actions가 학습 데이터와 앱 JavaScript 구문을 자동 검증합니다.
 
 ```bash
+node scripts/validate-data.mjs
 node scripts/validate-data-v2.mjs
 node --check app.js
 node --check app-enhancements.js
@@ -102,14 +108,25 @@ node --check content/grammar-v2.js
 node --check sw.js
 ```
 
+## GitHub Pages 배포
+
+`편입영어 학습 앱 배포` 워크플로는 기존 `bigdata-analysis-engineer-written`과 같은 방식으로 동작합니다.
+
+1. `main`의 앱 데이터를 검증합니다.
+2. 실행 파일만 `_site`에 구성합니다.
+3. GitHub Pages 아티팩트를 업로드합니다.
+4. `actions/deploy-pages`로 배포합니다.
+
+새 저장소에서는 GitHub Pages를 최초 한 번 활성화해야 합니다. GitHub에서 `Settings → Pages → Build and deployment → Source`를 `GitHub Actions`로 설정합니다. GitHub Free 개인 계정은 public 저장소에서 Pages를 사용할 수 있습니다. GitHub Pro 이상에서는 private 저장소에서도 Pages를 사용할 수 있습니다.
+
+Pages가 활성화되면 기본 프로젝트 주소는 `https://jiyeong-kor.github.io/transfer-english-trainer/` 형식입니다.
+
 ## 완성 PWA 패키지
 
 `PWA 패키지 생성` GitHub Actions가 `transfer-english-trainer-pwa` 아티팩트를 만듭니다. 아티팩트에는 실행에 필요한 정적 파일만 포함됩니다.
 
-## 휴대폰 설치와 배포
+## iPhone 설치
 
-PWA를 iPhone 홈 화면에 설치하려면 앱 파일을 HTTPS 주소에서 제공해야 합니다.
+GitHub Pages 배포가 끝난 뒤 Safari에서 배포 주소를 엽니다.
 
-이 저장소에는 개인 학습용 교재 기반 자료가 포함되어 있으므로 공개 GitHub Pages로 그대로 배포하지 않습니다. GitHub 공식 문서상 private 저장소에서 Pages를 사용하더라도 일반적인 Pages 사이트는 인터넷에 공개될 수 있으므로, 접근 제어가 되는 호스팅을 사용해야 합니다.
-
-접근 제어가 설정된 HTTPS 호스팅 주소가 준비되면 Safari에서 해당 주소를 열고 `공유 → 홈 화면에 추가`를 선택하면 됩니다.
+`공유 → 홈 화면에 추가`를 선택하면 일반 앱처럼 실행할 수 있습니다.
