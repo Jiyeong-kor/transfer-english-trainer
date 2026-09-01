@@ -12,6 +12,18 @@ const grammar = context.window.TRANSFER_ENGLISH_GRAMMAR;
 const all = [...vocab, ...grammar];
 const errors = [];
 
+function compactLeakText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^0-9a-z가-힣]+/g, "");
+}
+
+function exposesFullAnswer(value, answer) {
+  const visible = compactLeakText(value);
+  const correct = compactLeakText(answer);
+  return correct.length >= 4 && visible.includes(correct);
+}
+
 if (!Array.isArray(vocab) || vocab.length < 1) errors.push("어휘 데이터가 비어 있습니다.");
 if (!Array.isArray(grammar) || grammar.length < 1) errors.push("문법 데이터가 비어 있습니다.");
 
@@ -33,9 +45,16 @@ for (const item of all) {
 
   if (item.type === "grammar") {
     if (!item.title || !item.explanation) errors.push(`문법 설명 누락: ${item.id}`);
+    if (!item.quizPrompt) errors.push(`문법 quizPrompt 누락: ${item.id}`);
     if (!Array.isArray(item.distractors) || item.distractors.length < 3) errors.push(`문법 distractors 3개 미만: ${item.id}`);
     if (new Set(item.distractors).size !== item.distractors.length) errors.push(`문법 distractors 중복: ${item.id}`);
     if (item.distractors.includes(item.answer)) errors.push(`정답이 distractors에 포함됨: ${item.id}`);
+
+    for (const field of ["title", "prompt", "quizPrompt"]) {
+      if (exposesFullAnswer(item[field], item.answer)) {
+        errors.push(`정답 누출: ${item.id}의 ${field}에 정답 문자열/구조가 그대로 포함되어 있습니다.`);
+      }
+    }
   }
 }
 
