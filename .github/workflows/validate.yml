@@ -16,4 +16,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node scripts/validate-data.mjs
+      - name: 학습 데이터 검증
+        run: node scripts/validate-data.mjs
+      - name: 앱 자바스크립트 구문 검증
+        run: |
+          node --check app.js
+          node --check sw.js
