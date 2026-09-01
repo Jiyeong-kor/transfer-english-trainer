@@ -150,7 +150,10 @@ function getDailySet() {
 
 function progressStats() {
   const studied = ITEMS.filter((item) => reviewFor(item.id)?.seenCount > 0).length;
-  const weak = ITEMS.filter((item) => isWeak(item.id)).length;
+  const weak = ITEMS.filter((item) => {
+    const review = reviewFor(item.id);
+    return isWeak(item.id) || (item.focus && review?.lastGrade !== "good");
+  }).length;
   const due = ITEMS.filter((item) => dueNow(item.id)).length;
   return { studied, weak, due };
 }
@@ -317,6 +320,10 @@ function browseItems() {
 function startSingle(id) {
   const item = ITEM_MAP.get(id);
   if (!item) return;
+  if (state.activeSession) {
+    showToast("진행 중인 학습을 먼저 이어서 하거나 종료해 주세요.");
+    return;
+  }
   startSession([id], item.type === "vocab" ? "어휘 확인" : "문법 확인", "single");
 }
 
@@ -369,7 +376,10 @@ function renderTopbar(subtitle = "Notion 오답노트 기반") {
 function renderHome() {
   const stats = progressStats();
   const daily = getDailySet();
-  const dailyDone = daily.ids.filter((id) => reviewFor(id)?.lastReviewedAt?.slice(0, 10) === seoulDateKey()).length;
+  const dailyDone = daily.ids.filter((id) => {
+    const reviewedAt = reviewFor(id)?.lastReviewedAt;
+    return reviewedAt && seoulDateKey(new Date(reviewedAt)) === seoulDateKey();
+  }).length;
   const pct = Math.round((stats.studied / ITEMS.length) * 100);
   app.innerHTML = `
     <main class="shell">
