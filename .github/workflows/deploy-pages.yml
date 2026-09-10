@@ -52,6 +52,12 @@ jobs:
           node --check all-study.js
           node --check content/vocabulary.js
           node --check content/vocabulary-02.js
+          node --check content/vocabulary-hackers-750-day01.js
+          node --check content/vocabulary-hackers-750-day02.js
+          node --check content/vocabulary-hackers-750-day03-05.js
+          node --check content/vocabulary-hackers-750-day06-08.js
+          node --check content/vocabulary-hackers-750-day09-11.js
+          node --check content/vocabulary-hackers-750-day12-15.js
           node --check content/grammar.js
           node --check content/grammar-v2.js
           node --check sw.js
