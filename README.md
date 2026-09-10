@@ -10,13 +10,14 @@ Notion의 `편입 영어 오답노트`를 모바일에서 반복 학습하기 �
 
 ## 학습 데이터
 
-현재 앱에는 Notion 오답노트와 김영편입 영어 어휘 기출 1단계 학습 자료를 기준으로 총 95개 항목이 들어 있습니다.
+현재 앱에는 Notion 오답노트, 김영편입 영어 어휘 기출 1단계 학습 자료, `해커스편입 시험에 꼭 나오는 적중어휘 750`의 DAY 1~15 전체 어휘를 통합해 두었습니다. 해커스 자료의 750개 원본 행은 표제어, 뜻, 기출동의어, 출제학교를 보존합니다. 기존 데이터와 표제어가 같은 항목은 새 카드를 중복 생성하지 않고 기존 항목에 뜻, 유의어, 출제학교, 출처를 병합합니다.
 
-- 어휘 80개
+- 어휘
   - 실제 오답과 집중 복습 항목 구분
   - 핵심 뜻
-  - 유의어
+  - 등록된 기출동의어 전체
   - 혼동어
+  - 해커스 자료의 출제학교 메타데이터
 - 문법 15개
   - `provide A with B`
   - `view A as B`
@@ -25,6 +26,8 @@ Notion의 `편입 영어 오답노트`를 모바일에서 반복 학습하기 �
   - `occur`, `join`, `visit`
   - `lie / lay` 구분
   - `participate in`, `get 목적어 to V` 등
+
+해커스 원문에 기출동의어가 적혀 있지 않은 표제어는 임의의 유의어를 보충하지 않고 뜻 학습만 출제합니다.
 
 ## 학습 방식
 
@@ -42,7 +45,7 @@ Notion의 `편입 영어 오답노트`를 모바일에서 반복 학습하기 �
 - 가장 가까운 영어 표현을 고르는 4지선다
 - 혼동어가 있는 경우 의미를 구분하는 4지선다
 
-선지를 누르면 즉시 채점합니다. 정답과 오답은 자동으로 학습 기록에 반영합니다.
+각 어휘는 뜻과 등록된 각 유의어를 별도의 학습 목표로 관리합니다. 선지를 누르면 즉시 채점하며, 정답과 오답은 자동으로 학습 기록에 반영합니다.
 
 ### 문법 실전
 
@@ -90,6 +93,12 @@ Notion의 `편입 영어 오답노트`를 모바일에서 반복 학습하기 �
 ├── content/
 │   ├── vocabulary.js
 │   ├── vocabulary-02.js
+│   ├── vocabulary-hackers-750-day01.js
+│   ├── vocabulary-hackers-750-day02.js
+│   ├── vocabulary-hackers-750-day03-05.js
+│   ├── vocabulary-hackers-750-day06-08.js
+│   ├── vocabulary-hackers-750-day09-11.js
+│   ├── vocabulary-hackers-750-day12-15.js
 │   ├── grammar.js
 │   └── grammar-v2.js
 ├── scripts/
@@ -108,6 +117,7 @@ Notion의 `편입 영어 오답노트`를 모바일에서 반복 학습하기 �
 ```bash
 node scripts/validate-data.mjs
 node scripts/validate-data-v2.mjs
+node scripts/validate-vocab-exam.mjs
 node --check app.js
 node --check app-enhancements.js
 node --check app-ux-parity.js
