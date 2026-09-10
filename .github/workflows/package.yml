@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir -p dist/content
           cp index.html styles.css practice.css ux-fixes.css app.js app-enhancements.js exam-mode.js grammar-exam.js app-update.js new-problems.js manifest.webmanifest sw.js icon.svg dist/
-          cp content/vocabulary.js content/grammar-v2.js dist/content/
+          cp content/vocabulary.js content/vocabulary-02.js content/grammar-v2.js dist/content/
       - name: PWA 패키지 업로드
         uses: actions/upload-artifact@v4
         with:

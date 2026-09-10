@@ -2,7 +2,7 @@ import fs from "node:fs";
 import vm from "node:vm";
 
 global.window = {};
-for (const file of ["content/vocabulary.js", "content/grammar.js"]) {
+for (const file of ["content/vocabulary.js", "content/vocabulary-02.js", "content/grammar.js"]) {
   vm.runInThisContext(fs.readFileSync(file, "utf8"), { filename: file });
 }
 
@@ -11,7 +11,7 @@ const grammar = window.TRANSFER_ENGLISH_GRAMMAR;
 const items = [...vocab, ...grammar];
 
 const errors = [];
-if (vocab.length !== 40) errors.push(`어휘 개수 예상 40, 실제 ${vocab.length}`);
+if (vocab.length !== 80) errors.push(`어휘 개수 예상 80, 실제 ${vocab.length}`);
 if (grammar.length < 10) errors.push(`문법 항목이 너무 적습니다: ${grammar.length}`);
 
 const ids = new Set();
