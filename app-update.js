@@ -1,5 +1,5 @@
 (() => {
-  const APP_VERSION = 'v10';
+  const APP_VERSION = 'v11';
   const UPDATE_NOTICE_KEY = 'transfer-english-update-applied';
   let checking = false;
 

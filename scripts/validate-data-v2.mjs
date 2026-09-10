@@ -3,7 +3,7 @@ import vm from "node:vm";
 
 const context = { window: {} };
 vm.createContext(context);
-for (const path of ["content/vocabulary.js", "content/grammar-v2.js"]) {
+for (const path of ["content/vocabulary.js", "content/vocabulary-02.js", "content/grammar-v2.js"]) {
   vm.runInContext(fs.readFileSync(path, "utf8"), context, { filename: path });
 }
 
