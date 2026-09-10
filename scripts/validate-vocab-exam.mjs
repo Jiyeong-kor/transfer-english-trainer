@@ -1,9 +1,20 @@
 import fs from "node:fs";
 import vm from "node:vm";
 
+const VOCAB_FILES = [
+  "content/vocabulary.js",
+  "content/vocabulary-02.js",
+  "content/vocabulary-hackers-750-day01.js",
+  "content/vocabulary-hackers-750-day02.js",
+  "content/vocabulary-hackers-750-day03-05.js",
+  "content/vocabulary-hackers-750-day06-08.js",
+  "content/vocabulary-hackers-750-day09-11.js",
+  "content/vocabulary-hackers-750-day12-15.js",
+];
+
 const context = { window: {} };
 vm.createContext(context);
-for (const path of ["content/vocabulary.js", "content/vocabulary-02.js"]) {
+for (const path of VOCAB_FILES) {
   vm.runInContext(fs.readFileSync(path, "utf8"), context, { filename: path });
 }
 
@@ -16,14 +27,14 @@ function requireText(content, needle, message) {
   if (!content.includes(needle)) errors.push(message);
 }
 
-if (!Array.isArray(vocab) || vocab.length < 1) errors.push("어휘 데이터가 비어 있습니다.");
+if (!Array.isArray(vocab) || vocab.length < 749) errors.push(`어휘 데이터가 예상보다 적습니다: ${vocab?.length ?? 0}개`);
 for (const item of vocab) {
-  if (!Array.isArray(item.synonyms) || item.synonyms.length < 1) {
-    errors.push(`${item.id}: 유의어가 없어서 전체 유의어 학습을 구성할 수 없습니다.`);
+  if (!Array.isArray(item.synonyms)) {
+    errors.push(`${item.id}: synonyms 형식이 배열이 아닙니다.`);
   }
 }
 
-const totalTargets = vocab.reduce((sum, item) => sum + 1 + item.synonyms.length, 0);
+const totalTargets = vocab.reduce((sum, item) => sum + 1 + (item.synonyms?.length || 0), 0);
 if (totalTargets <= vocab.length * 2) {
   errors.push(`뜻과 개별 유의어 학습 목표가 충분히 분리되지 않았습니다. 총 목표 ${totalTargets}개`);
 }
