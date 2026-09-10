@@ -20,6 +20,8 @@ jobs:
         run: node scripts/validate-data-v2.mjs
       - name: 편입영어 실전형 UX 회귀 검증
         run: node scripts/validate-exam-ux.mjs
+      - name: 채점 후 선지 고정 검증
+        run: node scripts/validate-question-stability.mjs
       - name: 어휘 문제 품질 검증
         run: node scripts/validate-vocab-exam.mjs
       - name: 문법 실전형 출제 검증
@@ -35,6 +37,7 @@ jobs:
           node --check vocab-exam.js
           node --check app-update.js
           node --check new-problems.js
+          node --check question-stability.js
           node --check content/vocabulary.js
           node --check content/vocabulary-02.js
           node --check content/grammar-v2.js
