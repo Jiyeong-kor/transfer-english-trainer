@@ -12,6 +12,7 @@ const ASSETS = [
   "./vocab-exam.js",
   "./app-update.js",
   "./new-problems.js",
+  "./question-stability.js",
   "./content/vocabulary.js",
   "./content/vocabulary-02.js",
   "./content/grammar-v2.js",
