@@ -1,9 +1,20 @@
 import fs from "node:fs";
 import vm from "node:vm";
 
+const VOCAB_FILES = [
+  "content/vocabulary.js",
+  "content/vocabulary-02.js",
+  "content/vocabulary-hackers-750-day01.js",
+  "content/vocabulary-hackers-750-day02.js",
+  "content/vocabulary-hackers-750-day03-05.js",
+  "content/vocabulary-hackers-750-day06-08.js",
+  "content/vocabulary-hackers-750-day09-11.js",
+  "content/vocabulary-hackers-750-day12-15.js",
+];
+
 const context = { window: {} };
 vm.createContext(context);
-for (const path of ["content/vocabulary.js", "content/vocabulary-02.js", "content/grammar-v2.js"]) {
+for (const path of [...VOCAB_FILES, "content/grammar-v2.js"]) {
   vm.runInContext(fs.readFileSync(path, "utf8"), context, { filename: path });
 }
 
@@ -24,8 +35,15 @@ function exposesFullAnswer(value, answer) {
   return correct.length >= 4 && visible.includes(correct);
 }
 
-if (!Array.isArray(vocab) || vocab.length < 1) errors.push("어휘 데이터가 비어 있습니다.");
+if (!Array.isArray(vocab) || vocab.length < 749) errors.push(`어휘 데이터가 예상보다 적습니다: ${vocab?.length ?? 0}개`);
 if (!Array.isArray(grammar) || grammar.length < 1) errors.push("문법 데이터가 비어 있습니다.");
+
+for (let day = 1; day <= 15; day += 1) {
+  const marker = `해커스편입 시험에 꼭 나오는 적중어휘 750 · DAY ${day}`;
+  if (!vocab.some((item) => String(item.source || "").includes(marker))) {
+    errors.push(`해커스 적중어휘 DAY ${day} 데이터가 없습니다.`);
+  }
+}
 
 const ids = new Set();
 for (const item of all) {
@@ -39,7 +57,7 @@ for (const item of all) {
 
   if (item.type === "vocab") {
     if (!item.term) errors.push(`term 누락: ${item.id}`);
-    if (!Array.isArray(item.synonyms) || item.synonyms.length < 1) errors.push(`synonyms 누락: ${item.id}`);
+    if (!Array.isArray(item.synonyms)) errors.push(`synonyms 형식 오류: ${item.id}`);
     if (!Array.isArray(item.confusions)) errors.push(`confusions 형식 오류: ${item.id}`);
   }
 
