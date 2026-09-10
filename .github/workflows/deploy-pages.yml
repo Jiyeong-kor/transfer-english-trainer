@@ -48,6 +48,7 @@ jobs:
           node --check app-update.js
           node --check new-problems.js
           node --check question-stability.js
+          node --check grammar-hierarchy.js
           node --check content/vocabulary.js
           node --check content/vocabulary-02.js
           node --check content/grammar.js
