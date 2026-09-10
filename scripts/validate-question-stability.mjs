@@ -38,10 +38,10 @@ vm.runInContext(`
   const secondOptions = JSON.stringify(secondModel.options);
 
   if (firstVariant !== secondVariant) {
-    throw new Error(`채점 상태 변경 후 문제 유형이 바뀌었습니다: ${firstVariant} -> ${secondVariant}`);
+    throw new Error("채점 상태 변경 후 문제 유형이 바뀌었습니다: " + firstVariant + " -> " + secondVariant);
   }
   if (firstOptions !== secondOptions) {
-    throw new Error(`채점 상태 변경 후 선지가 바뀌었습니다: ${firstOptions} -> ${secondOptions}`);
+    throw new Error("채점 상태 변경 후 선지가 바뀌었습니다: " + firstOptions + " -> " + secondOptions);
   }
 `, context);
 
