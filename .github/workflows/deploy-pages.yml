@@ -33,6 +33,7 @@ jobs:
           node scripts/validate-data.mjs
           node scripts/validate-data-v2.mjs
           node scripts/validate-exam-ux.mjs
+          node scripts/validate-question-stability.mjs
           node scripts/validate-vocab-exam.mjs
           node scripts/validate-grammar-exam.mjs
           node scripts/validate-progress-priority.mjs
@@ -46,6 +47,7 @@ jobs:
           node --check vocab-exam.js
           node --check app-update.js
           node --check new-problems.js
+          node --check question-stability.js
           node --check content/vocabulary.js
           node --check content/vocabulary-02.js
           node --check content/grammar.js
