@@ -18,14 +18,17 @@ Notion의 `편입 영어 오답노트`를 모바일에서 반복 학습하기 �
   - 등록된 기출동의어 전체
   - 혼동어
   - 해커스 자료의 출제학교 메타데이터
-- 문법 15개
+- 문법 36개
   - `provide A with B`
   - `view A as B`
   - `allow A to V`
   - `recommend that S V원형`
-  - `occur`, `join`, `visit`
-  - `lie / lay` 구분
-  - `participate in`, `get 목적어 to V` 등
+  - `occur`, `happen`, `join`, `visit`, `discuss`, `inhabit`의 자동사·타동사 구분
+  - `lie / lay`, `rise / raise`, `affect / effect` 구분
+  - `participate in`, `rid A of B`, `prevent A from V-ing`
+  - `tend to V`, `anticipate / finish / risk + V-ing`
+  - `have + 목적어 + p.p.`, `get + 목적어 + to V`
+  - `make it + 형용사 + to V`, `request that S V원형` 등
 
 해커스 원문에 기출동의어가 적혀 있지 않은 표제어는 임의의 유의어를 보충하지 않고 뜻 학습만 출제합니다.
 
@@ -51,7 +54,7 @@ Notion의 `편입 영어 오답노트`를 모바일에서 반복 학습하기 �
 
 문법도 처음부터 선택지를 보여 줍니다. 정답 패턴을 머릿속에서 먼저 회상하도록 요구하지 않습니다.
 
-각 문법 항목의 정답 패턴과 오답 선택지를 이용하여 시험형 4지선다로 구성합니다.
+각 문법 항목의 정답 패턴과 오답 선택지를 이용하여 시험형 4지선다로 구성합니다. 2026-09-11에 추가한 김영편입 문법 기출 1단계 오답 21개도 각 개념당 2개의 문장형 변형 문제로 출제합니다.
 
 ### 20문제 실전 세트
 
@@ -81,8 +84,9 @@ Notion의 `편입 영어 오답노트`를 모바일에서 반복 학습하기 �
 ├── index.html
 ├── app.js
 ├── app-enhancements.js
-├── app-ux-parity.js
 ├── exam-mode.js
+├── grammar-exam.js
+├── grammar-exam-2026-09-11.js
 ├── app-update.js
 ├── styles.css
 ├── practice.css
@@ -100,7 +104,8 @@ Notion의 `편입 영어 오답노트`를 모바일에서 반복 학습하기 �
 │   ├── vocabulary-hackers-750-day09-11.js
 │   ├── vocabulary-hackers-750-day12-15.js
 │   ├── grammar.js
-│   └── grammar-v2.js
+│   ├── grammar-v2.js
+│   └── grammar-2026-09-11.js
 ├── scripts/
 │   ├── validate-data.mjs
 │   └── validate-data-v2.mjs
@@ -118,12 +123,16 @@ Notion의 `편입 영어 오답노트`를 모바일에서 반복 학습하기 �
 node scripts/validate-data.mjs
 node scripts/validate-data-v2.mjs
 node scripts/validate-vocab-exam.mjs
+node scripts/validate-grammar-exam.mjs
 node --check app.js
 node --check app-enhancements.js
-node --check app-ux-parity.js
 node --check exam-mode.js
+node --check grammar-exam.js
+node --check grammar-exam-2026-09-11.js
+node --check app-ux-parity.js
 node --check app-update.js
 node --check content/grammar-v2.js
+node --check content/grammar-2026-09-11.js
 node --check sw.js
 ```
 
