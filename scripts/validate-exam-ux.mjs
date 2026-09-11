@@ -30,6 +30,7 @@ function assert(condition, message) {
 
 const examIndex = index.indexOf('<script src="./exam-mode.js"></script>');
 const grammarExamIndex = index.indexOf('<script src="./grammar-exam.js"></script>');
+const extraGrammarExamIndex = index.indexOf('<script src="./grammar-exam-2026-09-11.js"></script>');
 const vocabExamIndex = index.indexOf('<script src="./vocab-exam.js"></script>');
 const updateIndex = index.indexOf('<script src="./app-update.js"></script>');
 const newProblemsIndex = index.indexOf('<script src="./new-problems.js"></script>');
@@ -39,15 +40,19 @@ const allStudyIndex = index.indexOf('<script src="./all-study.js"></script>');
 
 assert(examIndex >= 0, "index.html이 exam-mode.js를 로드하지 않습니다.");
 assert(grammarExamIndex > examIndex, "grammar-exam.js는 exam-mode.js 뒤에 로드되어야 합니다.");
-assert(vocabExamIndex > grammarExamIndex, "vocab-exam.js는 문법 출제 오버라이드 뒤에 로드되어야 합니다.");
+assert(extraGrammarExamIndex > grammarExamIndex, "신규 문법 실전형 문제는 기본 문법 출제 스크립트 뒤에 로드되어야 합니다.");
+assert(vocabExamIndex > extraGrammarExamIndex, "vocab-exam.js는 모든 문법 출제 오버라이드 뒤에 로드되어야 합니다.");
 assert(updateIndex > vocabExamIndex, "app-update.js는 어휘·문법 출제 스크립트 뒤에 로드되어야 합니다.");
 assert(newProblemsIndex > updateIndex, "최신 학습 기록 기반 출제 규칙은 기본 시험 모드와 업데이트 기능 뒤에 로드되어야 합니다.");
 assert(questionStabilityIndex > newProblemsIndex, "문항 안정화 규칙은 최신 출제 규칙 뒤에 로드되어야 합니다.");
 assert(grammarHierarchyIndex > questionStabilityIndex, "문법 문제 위계 조정은 최종 문제 렌더러 뒤에 적용되어야 합니다.");
 assert(allStudyIndex > grammarHierarchyIndex, "전체 문제 풀이 모드는 최종 출제·렌더링 오버라이드 뒤에 로드되어야 합니다.");
 assert(!index.includes("app-ux-parity.js"), "최종 문제 화면을 덮어쓰는 중간 UX 스크립트가 남아 있습니다.");
+assert(index.includes('./content/grammar-2026-09-11.js'), "index.html이 신규 문법 학습 데이터를 로드해야 합니다.");
 assert(pkg.includes("exam-mode.js"), "PWA 패키지에 exam-mode.js가 포함되어야 합니다.");
 assert(pkg.includes("grammar-exam.js"), "PWA 패키지에 grammar-exam.js가 포함되어야 합니다.");
+assert(pkg.includes("grammar-exam-2026-09-11.js"), "PWA 패키지에 신규 문법 실전 문제가 포함되어야 합니다.");
+assert(pkg.includes("content/grammar-2026-09-11.js"), "PWA 패키지에 신규 문법 학습 데이터가 포함되어야 합니다.");
 assert(pkg.includes("vocab-exam.js"), "PWA 패키지에 vocab-exam.js가 포함되어야 합니다.");
 assert(pkg.includes("new-problems.js"), "PWA 패키지에 최신 학습 기록 기반 출제 규칙이 포함되어야 합니다.");
 assert(pkg.includes("grammar-hierarchy.js"), "PWA 패키지에 문법 문제 위계 조정 스크립트가 포함되어야 합니다.");
@@ -89,10 +94,10 @@ assert(!exam.includes('return "recall"'), "exam-mode.js에 보기 없는 회상 
 assert(!exam.includes("정답 보기"), "exam-mode.js에 정답 보기 버튼이 다시 들어왔습니다.");
 assert(!exam.includes('data-enh-action="reveal"'), "exam-mode.js에 정답 공개용 reveal 동작이 다시 들어왔습니다.");
 
-assert(appUpdate.includes("const APP_VERSION = 'v15';"), "앱 업데이트 버전이 v15가 아닙니다.");
+assert(appUpdate.includes("const APP_VERSION = 'v16';"), "앱 업데이트 버전이 v16이 아닙니다.");
 assert(appUpdate.includes("registration.update()") && appUpdate.includes("SKIP_WAITING") && appUpdate.includes("window.location.reload()"), "앱 업데이트 적용 흐름이 없습니다.");
 assert(css.includes("border-left: 0 !important"), "카드 왼쪽 강조선 제거 규칙이 없습니다.");
-assert(sw.includes('transfer-english-trainer-v15') && sw.includes('./exam-mode.js') && sw.includes('./grammar-exam.js') && sw.includes('./vocab-exam.js') && sw.includes('./new-problems.js') && sw.includes('./grammar-hierarchy.js') && sw.includes('./all-study.js') && sw.includes('./content/vocabulary-02.js') && !sw.includes('./app-ux-parity.js'), "서비스 워커 캐시가 최종 문제 UX 구조와 맞지 않습니다.");
+assert(sw.includes('transfer-english-trainer-v16') && sw.includes('./exam-mode.js') && sw.includes('./grammar-exam.js') && sw.includes('./grammar-exam-2026-09-11.js') && sw.includes('./vocab-exam.js') && sw.includes('./new-problems.js') && sw.includes('./grammar-hierarchy.js') && sw.includes('./all-study.js') && sw.includes('./content/vocabulary-02.js') && sw.includes('./content/grammar-2026-09-11.js') && !sw.includes('./app-ux-parity.js'), "서비스 워커 캐시가 최종 문제 UX 구조와 맞지 않습니다.");
 for (const file of hackersVocabFiles) {
   assert(sw.includes(`./content/${file}`), `서비스 워커가 ${file}을 캐시해야 합니다.`);
 }
