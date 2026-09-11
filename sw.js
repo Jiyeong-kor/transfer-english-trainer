@@ -1,4 +1,4 @@
-const CACHE = "transfer-english-trainer-v15";
+const CACHE = "transfer-english-trainer-v16";
 const ASSETS = [
   "./",
   "./index.html",
@@ -9,6 +9,7 @@ const ASSETS = [
   "./app-enhancements.js",
   "./exam-mode.js",
   "./grammar-exam.js",
+  "./grammar-exam-2026-09-11.js",
   "./vocab-exam.js",
   "./app-update.js",
   "./new-problems.js",
@@ -24,6 +25,7 @@ const ASSETS = [
   "./content/vocabulary-hackers-750-day09-11.js",
   "./content/vocabulary-hackers-750-day12-15.js",
   "./content/grammar-v2.js",
+  "./content/grammar-2026-09-11.js",
   "./manifest.webmanifest",
   "./icon.svg",
 ];
