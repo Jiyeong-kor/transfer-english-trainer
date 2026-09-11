@@ -1,7 +1,15 @@
 import fs from "node:fs";
 
-const grammarData = fs.readFileSync("content/grammar-v2.js", "utf8");
-const grammarExam = fs.readFileSync("grammar-exam.js", "utf8");
+const grammarDataFiles = [
+  "content/grammar-v2.js",
+  "content/grammar-2026-09-11.js",
+];
+const grammarExamFiles = [
+  "grammar-exam.js",
+  "grammar-exam-2026-09-11.js",
+];
+const grammarData = grammarDataFiles.map((path) => fs.readFileSync(path, "utf8")).join("\n");
+const grammarExam = grammarExamFiles.map((path) => fs.readFileSync(path, "utf8")).join("\n");
 const index = fs.readFileSync("index.html", "utf8");
 
 function assert(condition, message) {
@@ -14,7 +22,7 @@ function assert(condition, message) {
 const grammarIds = [...grammarData.matchAll(/"id":"(g-[^"]+)"/g)].map((match) => match[1]);
 const uniqueGrammarIds = [...new Set(grammarIds)];
 
-assert(uniqueGrammarIds.length >= 15, `문법 데이터가 예상보다 적습니다. 현재 ${uniqueGrammarIds.length}개입니다.`);
+assert(uniqueGrammarIds.length >= 36, `문법 데이터가 예상보다 적습니다. 현재 ${uniqueGrammarIds.length}개입니다.`);
 for (const id of uniqueGrammarIds) {
   const occurrences = grammarExam.split(`"${id}"`).length - 1;
   assert(occurrences >= 1, `${id}의 실전형 문항이 없습니다.`);
@@ -22,11 +30,14 @@ for (const id of uniqueGrammarIds) {
 
 const examIndex = index.indexOf('<script src="./exam-mode.js"></script>');
 const grammarExamIndex = index.indexOf('<script src="./grammar-exam.js"></script>');
+const extraGrammarExamIndex = index.indexOf('<script src="./grammar-exam-2026-09-11.js"></script>');
 assert(grammarExamIndex > examIndex, "grammar-exam.js는 exam-mode.js 뒤에서 출제 모델을 덮어써야 합니다.");
+assert(extraGrammarExamIndex > grammarExamIndex, "추가 문법 실전 문제는 기본 문법 출제 모델 뒤에서 로드되어야 합니다.");
 
 assert(grammarExam.includes("Choose the option that best completes the sentence") || grammarExam.includes("Choose the grammatically correct sentence"), "문장 완성 또는 문장 판별형 문항이 없습니다.");
 assert(grammarExam.includes('term.textContent = "GRAMMAR"'), "문제 화면에서 개념명이 직접 노출됩니다.");
 assert(grammarExam.includes("enhChoiceModel = function enhChoiceModelTransferGrammar"), "문법 전용 실전 출제 모델 오버라이드가 없습니다.");
+assert(grammarExam.includes("enhChoiceModel = function enhChoiceModelTransferGrammar20260911"), "추가 문법 전용 실전 출제 모델 오버라이드가 없습니다.");
 assert(grammarExam.includes("enhHash(seed) % cases.length"), "같은 문법 개념에서 문항 변형이 선택되지 않습니다.");
 
 const bannedMetaPrompts = [
