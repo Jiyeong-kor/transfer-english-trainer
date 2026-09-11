@@ -11,10 +11,14 @@ const VOCAB_FILES = [
   "content/vocabulary-hackers-750-day09-11.js",
   "content/vocabulary-hackers-750-day12-15.js",
 ];
+const GRAMMAR_FILES = [
+  "content/grammar-v2.js",
+  "content/grammar-2026-09-11.js",
+];
 
 const context = { window: {} };
 vm.createContext(context);
-for (const path of [...VOCAB_FILES, "content/grammar-v2.js"]) {
+for (const path of [...VOCAB_FILES, ...GRAMMAR_FILES]) {
   vm.runInContext(fs.readFileSync(path, "utf8"), context, { filename: path });
 }
 
