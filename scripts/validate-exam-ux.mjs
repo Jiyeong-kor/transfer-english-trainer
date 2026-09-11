@@ -9,7 +9,9 @@ const newProblems = fs.readFileSync("new-problems.js", "utf8");
 const questionStability = fs.readFileSync("question-stability.js", "utf8");
 const grammarHierarchy = fs.readFileSync("grammar-hierarchy.js", "utf8");
 const allStudy = fs.readFileSync("all-study.js", "utf8");
+const currentGrammarReview = fs.readFileSync("current-grammar-review.js", "utf8");
 const css = fs.readFileSync("ux-fixes.css", "utf8");
+const responsiveCss = fs.readFileSync("responsive.css", "utf8");
 const sw = fs.readFileSync("sw.js", "utf8");
 const pkg = fs.readFileSync(".github/workflows/package.yml", "utf8");
 const hackersVocabFiles = [
@@ -37,6 +39,7 @@ const newProblemsIndex = index.indexOf('<script src="./new-problems.js"></script
 const questionStabilityIndex = index.indexOf('<script src="./question-stability.js"></script>');
 const grammarHierarchyIndex = index.indexOf('<script src="./grammar-hierarchy.js"></script>');
 const allStudyIndex = index.indexOf('<script src="./all-study.js"></script>');
+const currentReviewIndex = index.indexOf('<script src="./current-grammar-review.js"></script>');
 
 assert(examIndex >= 0, "index.html이 exam-mode.js를 로드하지 않습니다.");
 assert(grammarExamIndex > examIndex, "grammar-exam.js는 exam-mode.js 뒤에 로드되어야 합니다.");
@@ -47,12 +50,17 @@ assert(newProblemsIndex > updateIndex, "최신 학습 기록 기반 출제 규�
 assert(questionStabilityIndex > newProblemsIndex, "문항 안정화 규칙은 최신 출제 규칙 뒤에 로드되어야 합니다.");
 assert(grammarHierarchyIndex > questionStabilityIndex, "문법 문제 위계 조정은 최종 문제 렌더러 뒤에 적용되어야 합니다.");
 assert(allStudyIndex > grammarHierarchyIndex, "전체 문제 풀이 모드는 최종 출제·렌더링 오버라이드 뒤에 로드되어야 합니다.");
+assert(currentReviewIndex > allStudyIndex, "이번 문법 오답 전용 모드는 최종 홈 렌더러 뒤에 로드되어야 합니다.");
 assert(!index.includes("app-ux-parity.js"), "최종 문제 화면을 덮어쓰는 중간 UX 스크립트가 남아 있습니다.");
 assert(index.includes('./content/grammar-2026-09-11.js'), "index.html이 신규 문법 학습 데이터를 로드해야 합니다.");
+assert(index.includes('./responsive.css'), "index.html이 데스크톱 반응형 스타일을 로드해야 합니다.");
+
 assert(pkg.includes("exam-mode.js"), "PWA 패키지에 exam-mode.js가 포함되어야 합니다.");
 assert(pkg.includes("grammar-exam.js"), "PWA 패키지에 grammar-exam.js가 포함되어야 합니다.");
 assert(pkg.includes("grammar-exam-2026-09-11.js"), "PWA 패키지에 신규 문법 실전 문제가 포함되어야 합니다.");
 assert(pkg.includes("content/grammar-2026-09-11.js"), "PWA 패키지에 신규 문법 학습 데이터가 포함되어야 합니다.");
+assert(pkg.includes("current-grammar-review.js"), "PWA 패키지에 이번 문법 오답 전용 모드가 포함되어야 합니다.");
+assert(pkg.includes("responsive.css"), "PWA 패키지에 데스크톱 반응형 스타일이 포함되어야 합니다.");
 assert(pkg.includes("vocab-exam.js"), "PWA 패키지에 vocab-exam.js가 포함되어야 합니다.");
 assert(pkg.includes("new-problems.js"), "PWA 패키지에 최신 학습 기록 기반 출제 규칙이 포함되어야 합니다.");
 assert(pkg.includes("grammar-hierarchy.js"), "PWA 패키지에 문법 문제 위계 조정 스크립트가 포함되어야 합니다.");
@@ -90,19 +98,25 @@ assert(allStudy.includes("startDaily = startAllLearningTargets"), "기본 문제
 assert(allStudy.includes("session.targetVariants?.[session.index]"), "전체 학습 중 각 문제의 지정 유형을 강제하지 않습니다.");
 assert(allStudy.includes("saveState()"), "전체 학습 진행 위치가 저장되지 않습니다.");
 
+assert(currentGrammarReview.includes("이번 문법 오답만"), "이번 문법 오답 전용 버튼이 없습니다.");
+assert((currentGrammarReview.match(/"g-[^"]+"/g) || []).length === 27, "이번 문법 오답 개념은 27개여야 합니다.");
+assert(currentGrammarReview.includes('startSession(ids, "2026-09-11 문법 오답", "weak")'), "이번 문법 오답 전용 세션이 연결되지 않았습니다.");
+assert(responsiveCss.includes("@media (min-width: 900px)"), "데스크톱 반응형 분기가 없습니다.");
+assert(responsiveCss.includes("1180px") && responsiveCss.includes("grid-template-columns: repeat(3"), "데스크톱 폭과 3열 학습 모드가 적용되지 않았습니다.");
+
 assert(!exam.includes('return "recall"'), "exam-mode.js에 보기 없는 회상 분기가 다시 들어왔습니다.");
 assert(!exam.includes("정답 보기"), "exam-mode.js에 정답 보기 버튼이 다시 들어왔습니다.");
 assert(!exam.includes('data-enh-action="reveal"'), "exam-mode.js에 정답 공개용 reveal 동작이 다시 들어왔습니다.");
 
-assert(appUpdate.includes("const APP_VERSION = 'v16';"), "앱 업데이트 버전이 v16이 아닙니다.");
+assert(appUpdate.includes("const APP_VERSION = 'v17';"), "앱 업데이트 버전이 v17이 아닙니다.");
 assert(appUpdate.includes("registration.update()") && appUpdate.includes("SKIP_WAITING") && appUpdate.includes("window.location.reload()"), "앱 업데이트 적용 흐름이 없습니다.");
 assert(css.includes("border-left: 0 !important"), "카드 왼쪽 강조선 제거 규칙이 없습니다.");
-assert(sw.includes('transfer-english-trainer-v16') && sw.includes('./exam-mode.js') && sw.includes('./grammar-exam.js') && sw.includes('./grammar-exam-2026-09-11.js') && sw.includes('./vocab-exam.js') && sw.includes('./new-problems.js') && sw.includes('./grammar-hierarchy.js') && sw.includes('./all-study.js') && sw.includes('./content/vocabulary-02.js') && sw.includes('./content/grammar-2026-09-11.js') && !sw.includes('./app-ux-parity.js'), "서비스 워커 캐시가 최종 문제 UX 구조와 맞지 않습니다.");
+assert(sw.includes('transfer-english-trainer-v17') && sw.includes('./responsive.css') && sw.includes('./current-grammar-review.js') && sw.includes('./exam-mode.js') && sw.includes('./grammar-exam.js') && sw.includes('./grammar-exam-2026-09-11.js') && sw.includes('./vocab-exam.js') && sw.includes('./new-problems.js') && sw.includes('./grammar-hierarchy.js') && sw.includes('./all-study.js') && sw.includes('./content/vocabulary-02.js') && sw.includes('./content/grammar-2026-09-11.js') && !sw.includes('./app-ux-parity.js'), "서비스 워커 캐시가 최종 문제 UX 구조와 맞지 않습니다.");
 for (const file of hackersVocabFiles) {
   assert(sw.includes(`./content/${file}`), `서비스 워커가 ${file}을 캐시해야 합니다.`);
 }
 assert(sw.includes('event.data?.type === "SKIP_WAITING"'), "서비스 워커 즉시 업데이트 메시지 처리가 없습니다.");
 
 if (!process.exitCode) {
-  console.log("즉시 채점, 어휘 뜻·개별 유의어 출제, 실전 문법 문장형 출제, 문법 문제 시각적 위계, 전체 문제 풀이, 모르겠음, 다음 버튼 이동, 다음 문항 위치 정렬, 저장 후 나가기, 앱 업데이트 검증 통과");
+  console.log("반응형 데스크톱 홈, 이번 문법 오답 전용 모드, 즉시 채점, 전체 문제 풀이, 앱 업데이트 검증 통과");
 }
