@@ -51,6 +51,7 @@ jobs:
           node --check question-stability.js
           node --check grammar-hierarchy.js
           node --check all-study.js
+          node --check current-grammar-review.js
           node --check content/vocabulary.js
           node --check content/vocabulary-02.js
           node --check content/vocabulary-hackers-750-day01.js
